@@ -18,6 +18,7 @@ fun main() {
 
 fun Application.module() {
     configureContentNegotiation()
+    configureExceptions()
     configureDatabase()
     configureKoin()
     configureRouting()

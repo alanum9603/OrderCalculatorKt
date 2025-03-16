@@ -4,6 +4,7 @@ import com.ipeasa.repositories.MaterialRepository
 import com.ipeasa.repositories.MaterialRepositoryImpl
 import com.ipeasa.services.MaterialService
 import com.ipeasa.services.MaterialServiceImpl
+import com.ipeasa.utils.UuidService
 import io.ktor.server.application.*
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -19,6 +20,7 @@ fun Application.configureKoin() {
 }
 
 val appModule = module {
-    single<MaterialRepository> { MaterialRepositoryImpl() }
+    single { UuidService() }
+    single<MaterialRepository> { MaterialRepositoryImpl(get()) }
     single<MaterialService> { MaterialServiceImpl(get()) }
 }

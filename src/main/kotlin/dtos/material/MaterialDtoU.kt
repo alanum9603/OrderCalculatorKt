@@ -1,11 +1,10 @@
-package com.ipeasa.ddds
+package com.ipeasa.dtos.material
 
 import kotlinx.serialization.Serializable
-import java.util.UUID
 
 @Serializable
-data class Material(
-    val id : String? = null,
+data class MaterialDtoU(
+    val id : String,
     val name : String,
     val price : Double,
     val currency : String,
