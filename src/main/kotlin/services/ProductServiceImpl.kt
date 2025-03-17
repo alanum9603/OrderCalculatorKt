@@ -1,6 +1,7 @@
 package com.ipeasa.services
 
 import com.ipeasa.ddds.Product
+import com.ipeasa.ddds.ProductAndDetail
 import com.ipeasa.models.ProductDetailTable
 import com.ipeasa.models.ProductTable
 import com.ipeasa.repositories.ProductRepository
@@ -15,11 +16,11 @@ class ProductServiceImpl(
     }
 
     override fun readProductsByName(name: String, pageSize: Int, page: Long): List<Product> {
-        TODO("Not yet implemented")
+        return productRepository.getProductsByName(name, pageSize, page)
     }
 
-    override fun readProductById(id: String): Product? {
-        TODO("Not yet implemented")
+    override fun readProductById(id: String): ProductAndDetail? {
+        return productRepository.getProductByUuid(id)
     }
 
     override fun deleteProduct(id: String): Product? {

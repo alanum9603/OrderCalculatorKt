@@ -1,5 +1,6 @@
 package com.ipeasa.models
 
+import com.ipeasa.models.ProductTable.references
 import org.jetbrains.exposed.sql.Table
 
 object ProductDetailTable : Table("products_detail") {

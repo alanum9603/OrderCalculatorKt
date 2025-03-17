@@ -1,6 +1,8 @@
 package com.ipeasa.repositories
 
 import com.ipeasa.ddds.Product
+import com.ipeasa.ddds.ProductAndDetail
+import com.ipeasa.ddds.ProductDetail
 import com.ipeasa.models.ProductDetailTable
 import com.ipeasa.models.ProductTable
 import com.ipeasa.models.ProductTable.autoIncrement
@@ -13,6 +15,7 @@ import com.ipeasa.models.ProductTable.varchar
 import com.ipeasa.utils.UuidService
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -28,6 +31,19 @@ class ProductRepositoryImpl(
         )
     }
 
+    private fun productTableToProductAndDetail(rows: List<ResultRow>) : ProductAndDetail {
+        return ProductAndDetail(
+            id = rows.first()[ProductTable.productId].toString(),
+            name = rows.first()[ProductTable.name],
+            price = rows.first()[ProductTable.price],
+            currency = rows.first()[ProductTable.currency],
+            materials = rows.map { ProductDetail(
+                it[ProductDetailTable.materialId].toString(),
+                it[ProductDetailTable.quantity]
+            ) }
+        )
+    }
+
     override fun getAllProducts(pageSize: Int, page: Long): List<Product> {
         return transaction {
             ProductTable
@@ -40,21 +56,33 @@ class ProductRepositoryImpl(
     }
 
     override fun getProductsByName(name: String, pageSize: Int, page: Long): List<Product> {
-        TODO("Not yet implemented")
+        return transaction {
+            ProductTable
+                .selectAll()
+                .where { ProductTable.name like "%$name%" }
+                .andWhere { ProductTable.state eq true }
+                .orderBy(ProductTable.id to SortOrder.ASC)
+                .limit(pageSize).offset((page - 1) * pageSize)
+                .map { rowToProduct(it) }
+        }
     }
 
-    override fun getProductByUuid(id: String): Product? {
+    override fun getProductByUuid(id: String): ProductAndDetail? {
         val uuid = uuidService.toValidUuid(id)
 
-        transaction {
-            (ProductTable innerJoin ProductDetailTable)
-                .selectAll()
-                .where { ProductTable.productId eq uuid }
-                .orderBy(ProductTable.id to SortOrder.ASC)
-                .firstOrNull()
+        return transaction {
+            try {
+                (ProductTable leftJoin ProductDetailTable)
+                    .selectAll()
+                    .where { ProductTable.productId eq uuid }
+                    .orderBy(ProductTable.id to SortOrder.ASC)
+                    .groupBy { it[ProductTable.id] }
+                    .let { productTableToProductAndDetail(it.values.flatten()) }
+            } catch (ex: Exception) {
+                null
+            }
         }
 
-        return null
     }
 
     override fun postProduct(material: Product): Product? {
