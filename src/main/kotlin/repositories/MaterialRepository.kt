@@ -3,9 +3,9 @@ package com.ipeasa.repositories
 import com.ipeasa.ddds.Material
 
 interface MaterialRepository {
-    fun getAllMaterials() : List<Material>
+    fun getAllMaterials(pageSize : Int, page : Long) : List<Material>
 
-    fun getMaterialByName(name : String) : List<Material>
+    fun getMaterialsByName(name : String, pageSize : Int, page : Long) : List<Material>
 
     fun getMaterialByUuid(id : String) : Material?
 

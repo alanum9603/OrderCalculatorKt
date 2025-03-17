@@ -15,27 +15,33 @@ import io.ktor.server.routing.*
 fun Route.materialRoutes(materialService: MaterialService) {
     route("/material") {
         get {
-            call.respond(materialService.readAllMaterials())
+            val pageSize : Int? = call.request.queryParameters["pageSize"]?.trim()?.toIntOrNull()
+            val page : Long?    = call.request.queryParameters["page"]?.trim()?.toLongOrNull()
+            if (pageSize !== null && page !== null) {
+                call.respond(materialService.readAllMaterials(pageSize, page))
+            }
         }
 
-        get("/search-by-name/{name?}") {
-            val name : String? = call.parameters["name"]?.trim()
+        get("/search-by-name") {
+            val name : String?  = call.request.queryParameters["name"]?.trim()
+            val pageSize : Int? = call.request.queryParameters["pageSize"]?.trim()?.toIntOrNull()
+            val page : Long?    = call.request.queryParameters["page"]?.trim()?.toLongOrNull()
 
-            if (name.isNullOrEmpty()) {
-                call.respond(HttpStatusCode.BadRequest, "Debe ingresar un nombre válido")
-            } else {
-                val materialList : List<Material> = materialService.readMaterialByName(name)
+            if (!name.isNullOrEmpty() && pageSize !== null && page !== null) {
+                val materialList : List<Material> = materialService.readMaterialByName(name, pageSize, page)
 
                 if (materialList.isNotEmpty()) {
                     call.respond(materialList)
                 } else {
                     throw ObjectNotFoundException(message = "nombre")
                 }
+            } else {
+                call.respond(HttpStatusCode.BadRequest, "Debe ingresar un nombre válido")
             }
         }
 
-        get("/search-by-id/{id?}") {
-            val id : String? = call.parameters["id"]?.trim()
+        get("/search-by-id") {
+            val id : String? = call.request.queryParameters["id"]?.trim()
 
             if (!id.isNullOrEmpty()) {
                 val material : Material? = materialService.readMaterialById(id)
@@ -70,11 +76,12 @@ fun Route.materialRoutes(materialService: MaterialService) {
             }
         }
 
-        delete("/{id?}") {
-            val id = call.parameters["id"]?.trim()
+        delete {
+            val id = call.request.queryParameters["id"]?.trim()
 
             if (!id.isNullOrEmpty()) {
                 val material = materialService.deleteMaterial(id)
+                call.respond(HttpStatusCode.OK, material!!)
             } else {
                 throw InvalidUuidException(message = "El id esta vacío")
             }

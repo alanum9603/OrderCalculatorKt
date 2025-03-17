@@ -21,23 +21,27 @@ class MaterialRepositoryImpl(
         )
     }
 
-    override fun getAllMaterials() : List<Material> {
+    override fun getAllMaterials(pageSize : Int, page : Long) : List<Material> {
         return transaction {
             MaterialTable
                 .selectAll()
                 .where { MaterialTable.state eq true }
+                .orderBy(MaterialTable.id to SortOrder.ASC)
+                .limit(pageSize).offset((page - 1) * pageSize)
                 .map {
                     rowToMaterial(it)
                 }
         }
     }
 
-    override fun getMaterialByName(name: String): List<Material> {
+    override fun getMaterialsByName(name: String, pageSize : Int, page : Long): List<Material> {
         return transaction {
             MaterialTable
                 .selectAll()
                 .where { MaterialTable.name like "%$name%" }
                 .andWhere { MaterialTable.state eq true }
+                .orderBy(MaterialTable.id to SortOrder.ASC)
+                .limit(pageSize).offset((page - 1) * pageSize)
                 .map { rowToMaterial(it) }
         }
     }
@@ -50,6 +54,7 @@ class MaterialRepositoryImpl(
                 .selectAll()
                 .where { MaterialTable.materialId eq uuid }
                 .andWhere { MaterialTable.state eq true }
+                .orderBy(MaterialTable.id to SortOrder.ASC)
                 .map { rowToMaterial(it) }
                 .firstOrNull()
         }
@@ -60,21 +65,14 @@ class MaterialRepositoryImpl(
         val uuid = uuidService.generateUuidV6()
 
         transaction {
-            try {
-
-                MaterialTable
-                    .insert {
-                        it[materialId] = uuid
-                        it[name] = material.name
-                        it[price] = material.price
-                        it[unit] = material.unit
-                        it[currency] = material.currency
-                    }
-
-                getMaterialByUuid(uuid.toString())
-            } catch (ex: Exception) {
-                null
-            }
+            MaterialTable
+                .insert {
+                    it[materialId] = uuid
+                    it[name] = material.name
+                    it[price] = material.price
+                    it[unit] = material.unit
+                    it[currency] = material.currency
+                }
         }
 
         return getMaterialByUuid(uuid.toString())
@@ -94,23 +92,20 @@ class MaterialRepositoryImpl(
                 }
         }
 
-        return getMaterialByUuid(material.id!!)
+        return getMaterialByUuid(material.id)
     }
 
     override fun deleteMaterial(id: String): Material? {
-        return transaction {
-            try {
-                val uuid = uuidService.toValidUuid(id)
+        val uuid = uuidService.toValidUuid(id)
+        val material = getMaterialByUuid(id)
 
-                MaterialTable
-                    .update(where = { MaterialTable.materialId eq uuid }) {
-                        it[state] = false
-                    }
-
-                getMaterialByUuid(uuid.toString())
-            } catch (ex : Exception) {
-                null
-            }
+        transaction {
+            MaterialTable
+                .update(where = { MaterialTable.materialId eq uuid }) {
+                    it[state] = false
+                }
         }
+
+        return material
     }
 }

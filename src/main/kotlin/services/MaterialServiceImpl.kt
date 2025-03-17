@@ -8,12 +8,12 @@ import com.ipeasa.repositories.MaterialRepository
 class MaterialServiceImpl(
     private val materialRepository: MaterialRepository
 ) : MaterialService {
-    override fun readAllMaterials(): List<Material> {
-        return materialRepository.getAllMaterials()
+    override fun readAllMaterials(pageSize : Int, page : Long): List<Material> {
+        return materialRepository.getAllMaterials(pageSize, page)
     }
 
-    override fun readMaterialByName(name: String): List<Material> {
-        return materialRepository.getMaterialByName(name)
+    override fun readMaterialByName(name: String, pageSize : Int, page : Long): List<Material> {
+        return materialRepository.getMaterialsByName(name, pageSize, page)
     }
 
     override fun readMaterialById(id: String): Material? {
