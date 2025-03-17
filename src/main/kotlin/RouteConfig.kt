@@ -18,6 +18,7 @@ fun Application.configureRouting() {
             materialRoutes(materialService)
             productRoutes(productService)
         }
+
         route("{...}") {
             handle {
                 throw InvalidRouteException()
