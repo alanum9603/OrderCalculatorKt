@@ -5,7 +5,7 @@ import com.ipeasa.dtos.material.MaterialDtoC
 import com.ipeasa.dtos.material.MaterialDtoU
 import com.ipeasa.exceptions.InvalidArgumentException
 import com.ipeasa.exceptions.InvalidUuidException
-import com.ipeasa.exceptions.NotFoundException
+import com.ipeasa.exceptions.ObjectNotFoundException
 import com.ipeasa.services.MaterialService
 import io.ktor.http.*
 import io.ktor.server.request.*
@@ -29,7 +29,7 @@ fun Route.materialRoutes(materialService: MaterialService) {
                 if (materialList.isNotEmpty()) {
                     call.respond(materialList)
                 } else {
-                    throw NotFoundException(message = "nombre")
+                    throw ObjectNotFoundException(message = "nombre")
                 }
             }
         }

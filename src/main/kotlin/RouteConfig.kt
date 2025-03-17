@@ -1,6 +1,7 @@
 package com.ipeasa
 
 import com.ipeasa.controllers.materialRoutes
+import com.ipeasa.exceptions.InvalidRouteException
 import com.ipeasa.services.MaterialService
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
@@ -12,6 +13,11 @@ fun Application.configureRouting() {
     routing {
         route("/api") {
             materialRoutes(materialService)
+        }
+        route("{...}") {
+            handle {
+                throw InvalidRouteException()
+            }
         }
     }
 }

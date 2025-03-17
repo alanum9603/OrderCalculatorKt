@@ -35,7 +35,7 @@ class InvalidUuidException(
     message = message
 )
 
-class NotFoundException(
+class ObjectNotFoundException(
     message: String = "objeto"
 ) : CustomException(
     error = "No encontrado",
@@ -47,5 +47,11 @@ class InvalidArgumentException(
 ) : CustomException(
     error = "Argumento inválido",
     message = "el $message proporcionado es inválido"
+)
+
+class InvalidRouteException(
+) : CustomException(
+    error = "Ruta inválida",
+    message = "La ruta proporcionada es inválida"
 )
 
