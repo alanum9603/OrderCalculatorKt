@@ -28,7 +28,7 @@ fun Route.materialRoutes(materialService: MaterialService) {
             val page : Long?    = call.request.queryParameters["page"]?.trim()?.toLongOrNull()
 
             if (!name.isNullOrEmpty() && pageSize !== null && page !== null) {
-                val materialList : List<Material> = materialService.readMaterialByName(name, pageSize, page)
+                val materialList : List<Material> = materialService.readMaterialsByName(name, pageSize, page)
 
                 if (materialList.isNotEmpty()) {
                     call.respond(materialList)

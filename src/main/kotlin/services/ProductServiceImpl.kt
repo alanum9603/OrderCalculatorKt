@@ -1,0 +1,28 @@
+package com.ipeasa.services
+
+import com.ipeasa.ddds.Product
+import com.ipeasa.models.ProductDetailTable
+import com.ipeasa.models.ProductTable
+import com.ipeasa.repositories.ProductRepository
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
+
+class ProductServiceImpl(
+    private val productRepository: ProductRepository
+) : ProductService {
+    override fun readAllProducts(pageSize: Int, page: Long): List<Product> {
+        return productRepository.getAllProducts(pageSize, page)
+    }
+
+    override fun readProductsByName(name: String, pageSize: Int, page: Long): List<Product> {
+        TODO("Not yet implemented")
+    }
+
+    override fun readProductById(id: String): Product? {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteProduct(id: String): Product? {
+        TODO("Not yet implemented")
+    }
+}

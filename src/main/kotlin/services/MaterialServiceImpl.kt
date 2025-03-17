@@ -12,7 +12,7 @@ class MaterialServiceImpl(
         return materialRepository.getAllMaterials(pageSize, page)
     }
 
-    override fun readMaterialByName(name: String, pageSize : Int, page : Long): List<Material> {
+    override fun readMaterialsByName(name: String, pageSize : Int, page : Long): List<Material> {
         return materialRepository.getMaterialsByName(name, pageSize, page)
     }
 

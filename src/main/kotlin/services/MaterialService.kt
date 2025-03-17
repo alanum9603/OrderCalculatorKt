@@ -7,7 +7,7 @@ import com.ipeasa.dtos.material.MaterialDtoU
 interface MaterialService {
     fun readAllMaterials(pageSize : Int, page : Long) : List<Material>
 
-    fun readMaterialByName(name : String, pageSize : Int, page : Long) : List<Material>
+    fun readMaterialsByName(name : String, pageSize : Int, page : Long) : List<Material>
 
     fun readMaterialById(id : String) : Material?
 
