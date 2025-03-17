@@ -42,3 +42,10 @@ class NotFoundException(
     message = "No se encontraron coincidencias con el $message proporcionado"
 )
 
+class InvalidArgumentException(
+    message: String = "argumento"
+) : CustomException(
+    error = "Argumento inválido",
+    message = "el $message proporcionado es inválido"
+)
+

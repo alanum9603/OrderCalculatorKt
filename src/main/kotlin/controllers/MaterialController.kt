@@ -2,6 +2,8 @@ package com.ipeasa.controllers
 
 import com.ipeasa.ddds.Material
 import com.ipeasa.dtos.material.MaterialDtoC
+import com.ipeasa.dtos.material.MaterialDtoU
+import com.ipeasa.exceptions.InvalidArgumentException
 import com.ipeasa.exceptions.InvalidUuidException
 import com.ipeasa.exceptions.NotFoundException
 import com.ipeasa.services.MaterialService
@@ -35,9 +37,7 @@ fun Route.materialRoutes(materialService: MaterialService) {
         get("/search-by-id/{id?}") {
             val id : String? = call.parameters["id"]?.trim()
 
-            if (id.isNullOrEmpty()) {
-                throw InvalidUuidException(message = "El id esta vacío")
-            } else {
+            if (!id.isNullOrEmpty()) {
                 val material : Material? = materialService.readMaterialById(id)
 
                 if (material !== null) {
@@ -45,16 +45,38 @@ fun Route.materialRoutes(materialService: MaterialService) {
                 } else {
                     throw InvalidUuidException(message = "Material con id $id no encontrado")
                 }
+            } else {
+                throw InvalidUuidException(message = "El id esta vacío")
             }
         }
 
         post {
-            val material = materialService.postMaterial(call.receive<MaterialDtoC>())
+            val material = materialService.createMaterial(call.receive<MaterialDtoC>())
 
             if (material !== null) {
                 call.respond(material)
             } else {
-                call.respond(HttpStatusCode.BadRequest, "Debe pasar todos los argumentos del material")
+                throw InvalidArgumentException("material")
+            }
+        }
+
+        put {
+            val material = materialService.updateMaterial(call.receive<MaterialDtoU>())
+
+            if (material !== null) {
+                call.respond(material)
+            } else {
+                throw InvalidArgumentException("material")
+            }
+        }
+
+        delete("/{id?}") {
+            val id = call.parameters["id"]?.trim()
+
+            if (!id.isNullOrEmpty()) {
+                val material = materialService.deleteMaterial(id)
+            } else {
+                throw InvalidUuidException(message = "El id esta vacío")
             }
         }
     }

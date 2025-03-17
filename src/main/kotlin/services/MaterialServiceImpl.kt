@@ -20,22 +20,30 @@ class MaterialServiceImpl(
         return materialRepository.getMaterialByUuid(id)
     }
 
-    override fun postMaterial(materialDtoC: MaterialDtoC): Material? {
+    override fun createMaterial(materialDtoC: MaterialDtoC): Material? {
         return materialRepository.postMaterial(
             Material(
-                name = materialDtoC.name,
-                unit = materialDtoC.unit,
-                price = materialDtoC.price,
-                currency = materialDtoC.currency
+                name        = materialDtoC.name,
+                unit        = materialDtoC.unit,
+                price       = materialDtoC.price,
+                currency    = materialDtoC.currency
             )
         )
     }
 
-    override fun putMaterial(materialDtoU: MaterialDtoU): Material? {
-        TODO("Not yet implemented")
+    override fun updateMaterial(materialDtoU: MaterialDtoU): Material? {
+        return materialRepository.putMaterial(
+            Material(
+                id          = materialDtoU.id,
+                name        = materialDtoU.name,
+                unit        = materialDtoU.unit,
+                price       = materialDtoU.price,
+                currency    = materialDtoU.currency
+            )
+        )
     }
 
     override fun deleteMaterial(id : String): Material? {
-        TODO("Not yet implemented")
+        return materialRepository.deleteMaterial(id)
     }
 }

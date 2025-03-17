@@ -13,5 +13,5 @@ interface MaterialRepository {
 
     fun putMaterial(material: Material) : Material?
 
-    fun deleteMaterial(material: Material) : Material?
+    fun deleteMaterial(id: String) : Material?
 }

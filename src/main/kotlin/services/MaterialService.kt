@@ -11,9 +11,9 @@ interface MaterialService {
 
     fun readMaterialById(id : String) : Material?
 
-    fun postMaterial(materialDtoC: MaterialDtoC) : Material?
+    fun createMaterial(materialDtoC: MaterialDtoC) : Material?
 
-    fun putMaterial(materialDtoU: MaterialDtoU) : Material?
+    fun updateMaterial(materialDtoU: MaterialDtoU) : Material?
 
     fun deleteMaterial(id : String) : Material?
 }

@@ -1,5 +1,6 @@
 package com.ipeasa
 
+import com.ipeasa.exceptions.InvalidArgumentException
 import com.ipeasa.exceptions.InvalidUuidException
 import com.ipeasa.exceptions.NotFoundException
 import io.ktor.http.*
@@ -13,8 +14,14 @@ fun Application.configureExceptions() {
             call.respond(HttpStatusCode.BadRequest, cause.toExceptionRequest())
         }
 
+        exception<InvalidArgumentException> { call, cause ->
+            call.respond(HttpStatusCode.BadRequest, cause.toExceptionRequest())
+        }
+
         exception<NotFoundException> { call, cause ->
             call.respond(HttpStatusCode.BadRequest, cause.toExceptionRequest())
         }
+
+        exception<
     }
 }
