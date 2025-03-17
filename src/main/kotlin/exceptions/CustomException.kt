@@ -29,9 +29,9 @@ open class CustomException(
 }
 
 class InvalidUuidException(
-    message: String = "el UUID proporcionado es inválido"
+    message: String = "el ID proporcionado es inválido"
 ) : CustomException(
-    error = "UUID inválido",
+    error = "ID inválido",
     message = message
 )
 
