@@ -59,7 +59,7 @@ CREATE TABLE `products_detail`
 	`id` bigint AUTO_INCREMENT NOT NULL,
 	`product_id` bigint,
     `material_id` bigint,
-    `quantity` int,
+    `quantity` double,
     CONSTRAINT `product_detail_pk_id` PRIMARY KEY (`id`),
     CONSTRAINT `product_detail_fk_product_id` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`),
     CONSTRAINT `product_detail_fk_material_id` FOREIGN KEY (`material_id`) REFERENCES `materials`(`id`),

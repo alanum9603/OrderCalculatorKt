@@ -70,6 +70,7 @@ class MaterialRepositoryImpl(
                     it[price] = material.price
                     it[unit] = material.unit
                     it[currency] = material.currency
+                    it[state] = true
                 }
         }
 

@@ -3,6 +3,7 @@ package com.ipeasa.controllers
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
 import com.ipeasa.dtos.product.ProductDtoC
+import com.ipeasa.dtos.product.ProductDtoU
 import com.ipeasa.exceptions.InvalidUuidException
 import com.ipeasa.exceptions.ObjectNotFoundException
 import com.ipeasa.services.ProductService
@@ -58,16 +59,13 @@ fun Route.productRoutes(productService: ProductService) {
         post {
             val productAndDetail = productService.createProduct(call.receive<ProductDtoC>())
 
-            println("hola")
-            print(productAndDetail.toString())
-
             if (productAndDetail !== null) {
                 call.respond(HttpStatusCode.OK, productAndDetail)
             }
         }
 
         put {
-
+            val productAndDetail = productService.updateProduct(call.receive<ProductDtoU>())
         }
 
         delete {

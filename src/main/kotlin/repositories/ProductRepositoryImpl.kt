@@ -95,6 +95,7 @@ class ProductRepositoryImpl(
                     it[name] = productAndDetail.name
                     it[price] = productAndDetail.price
                     it[currency] = productAndDetail.currency
+                    it[state] = true
                 }
 
             val productId : Long = ProductTable
@@ -109,9 +110,9 @@ class ProductRepositoryImpl(
                         .where { MaterialTable.materialId eq uuidService.toValidUuid(productDetail.material.id.toString()) }
                         .single()[MaterialTable.id].toLong()
 
-                    this[ProductDetailTable.productId] = productId
+                    this[ProductDetailTable.productId]  = productId
                     this[ProductDetailTable.materialId] = materialId
-                    this[ProductDetailTable.quantity] = productDetail.quantity
+                    this[ProductDetailTable.quantity]   = productDetail.quantity
                 }
         }
 

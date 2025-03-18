@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class ProductDetailDtoU(
     val id : Long? = null,
     val materialId : String,
-    val quantity : Int
+    val quantity : Double
 )
