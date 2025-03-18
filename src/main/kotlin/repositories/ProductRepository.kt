@@ -2,7 +2,6 @@ package com.ipeasa.repositories
 
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
-import com.ipeasa.dtos.product.ProductDtoC
 
 interface ProductRepository {
     fun getAllProducts(pageSize : Int, page : Long) : List<Product>

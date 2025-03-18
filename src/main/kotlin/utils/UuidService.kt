@@ -2,7 +2,6 @@ package com.ipeasa.utils
 
 import com.github.f4b6a3.uuid.UuidCreator
 import com.ipeasa.exceptions.InvalidUuidException
-import io.ktor.server.plugins.*
 import java.util.UUID
 
 class UuidService {

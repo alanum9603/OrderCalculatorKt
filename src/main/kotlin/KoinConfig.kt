@@ -34,6 +34,6 @@ val appModule = module {
     single<DtoMapperMaterial> { DtoMapperMaterialImpl() }
     single<DtoMapperProduct> { DtoMapperProductImpl(get(), get()) }
 
-    single<MaterialService> { MaterialServiceImpl(get()) }
+    single<MaterialService> { MaterialServiceImpl(get(), get()) }
     single<ProductService> { ProductServiceImpl(get(), get()) }
 }

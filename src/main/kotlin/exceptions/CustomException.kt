@@ -1,6 +1,5 @@
 package com.ipeasa.exceptions
 
-import kotlinx.serialization.Serializable
 import java.util.Date
 
 open class CustomException(

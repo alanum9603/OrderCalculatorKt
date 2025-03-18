@@ -1,6 +1,5 @@
 package com.ipeasa.controllers
 
-import com.ipeasa.ddds.Material
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
 import com.ipeasa.dtos.product.ProductDtoC
@@ -65,6 +64,10 @@ fun Route.productRoutes(productService: ProductService) {
             if (productAndDetail !== null) {
                 call.respond(HttpStatusCode.OK, productAndDetail)
             }
+        }
+
+        put {
+
         }
 
         delete {

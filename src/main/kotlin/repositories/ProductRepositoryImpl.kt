@@ -16,28 +16,28 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     private fun rowToProduct(row: ResultRow): Product {
         return Product(
-            id = row[ProductTable.productId].toString(),
-            name = row[ProductTable.name],
-            price = row[ProductTable.price],
-            currency = row[ProductTable.currency]
+            id          = row[ProductTable.productId].toString(),
+            name        = row[ProductTable.name],
+            price       = row[ProductTable.price],
+            currency    = row[ProductTable.currency]
         )
     }
 
     private fun productTableToProductAndDetail(rows: List<ResultRow>): ProductAndDetail {
         return ProductAndDetail(
-            id = rows.first()[ProductTable.productId].toString(),
-            name = rows.first()[ProductTable.name],
-            price = rows.first()[ProductTable.price],
-            currency = rows.first()[ProductTable.currency],
-            materials = rows.map {
+            id          = rows.first()[ProductTable.productId].toString(),
+            name        = rows.first()[ProductTable.name],
+            price       = rows.first()[ProductTable.price],
+            currency    = rows.first()[ProductTable.currency],
+            materials   = rows.map {
                 ProductDetail(
                     quantity = it[ProductDetailTable.quantity],
                     material = Material(
-                        id = it[MaterialTable.materialId].toString(),
-                        name = it[MaterialTable.name],
-                        price = it[MaterialTable.price],
-                        currency = it[MaterialTable.currency],
-                        unit = it[MaterialTable.unit]
+                        id          = it[MaterialTable.materialId].toString(),
+                        name        = it[MaterialTable.name],
+                        price       = it[MaterialTable.price],
+                        currency    = it[MaterialTable.currency],
+                        unit        = it[MaterialTable.unit]
                     )
                 )
             }
