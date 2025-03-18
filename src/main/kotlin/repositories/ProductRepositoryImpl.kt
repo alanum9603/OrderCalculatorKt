@@ -10,6 +10,7 @@ import com.ipeasa.models.ProductTable
 import com.ipeasa.utils.UuidService
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.UUID
 
 class ProductRepositoryImpl(
     private val uuidService: UuidService
@@ -42,6 +43,26 @@ class ProductRepositoryImpl(
                 )
             }
         )
+    }
+
+    private fun getProductIdByUuid(uuid: UUID) : Long {
+        return transaction {
+            ProductTable
+                .select(ProductTable.id)
+                .where { ProductTable.productId eq uuid }
+                .single()[ProductTable.id].toLong()
+        }
+    }
+
+    private fun getMaterialIdByUuid(uuidString: String?) : Long {
+        val uuid = uuidService.toValidUuid(uuidString!!)
+
+        return transaction {
+            MaterialTable
+                .select(MaterialTable.id)
+                .where { MaterialTable.materialId eq uuid }
+                .single()[MaterialTable.id].toLong()
+        }
     }
 
     override fun getAllProducts(pageSize: Int, page: Long): List<Product> {
@@ -98,21 +119,17 @@ class ProductRepositoryImpl(
                     it[state] = true
                 }
 
-            val productId : Long = ProductTable
-                .select(ProductTable.id)
-                .where { ProductTable.productId eq uuid }
-                .single()[ProductTable.id].toLong()
+            val theProductId : Long = getProductIdByUuid(uuid)
 
             ProductDetailTable
                 .batchInsert(productAndDetail.materials) { productDetail ->
-                    val materialId: Long = MaterialTable
-                        .select(MaterialTable.id)
-                        .where { MaterialTable.materialId eq uuidService.toValidUuid(productDetail.material.id.toString()) }
-                        .single()[MaterialTable.id].toLong()
+                        val materialId: Long = getMaterialIdByUuid(
+                            productDetail.material.id
+                        )
 
-                    this[ProductDetailTable.productId]  = productId
-                    this[ProductDetailTable.materialId] = materialId
-                    this[ProductDetailTable.quantity]   = productDetail.quantity
+                        this[ProductDetailTable.productId]  = theProductId
+                        this[ProductDetailTable.materialId] = materialId
+                        this[ProductDetailTable.quantity]   = productDetail.quantity
                 }
         }
 
@@ -121,7 +138,31 @@ class ProductRepositoryImpl(
 
 
     override fun putProduct(productAndDetail: ProductAndDetail): ProductAndDetail? {
-        TODO("Not yet implemented")
+        val uuid = uuidService.toValidUuid(productAndDetail.id!!)
+
+        transaction {
+            ProductTable
+                .update(where = { ProductTable.productId eq uuid }) {
+                    it[name] = productAndDetail.name
+                    it[price] = productAndDetail.price
+                    it[currency] = productAndDetail.currency
+                }
+
+            val theProductId : Long = getProductIdByUuid(uuid)
+
+            ProductDetailTable
+                .batchUpsert(productAndDetail.materials) { productDetail ->
+                        val materialId: Long = getMaterialIdByUuid(
+                            productDetail.material.id
+                        )
+
+                        this[ProductDetailTable.productId] = theProductId
+                        this[ProductDetailTable.materialId] = materialId
+                        this[ProductDetailTable.quantity] = productDetail.quantity
+                    }
+        }
+
+        return getProductByUuid(productAndDetail.id)
     }
 
     override fun deleteProduct(id: String): ProductAndDetail? {
