@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProductDetail(
-    val material: String,
+    val material: Material,
     val quantity: Int
 )

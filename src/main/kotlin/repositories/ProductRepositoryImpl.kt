@@ -1,14 +1,17 @@
 package com.ipeasa.repositories
 
+import com.ipeasa.ddds.Material
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
 import com.ipeasa.ddds.ProductDetail
+import com.ipeasa.models.MaterialTable
 import com.ipeasa.models.ProductDetailTable
 import com.ipeasa.models.ProductTable
 import com.ipeasa.models.ProductTable.autoIncrement
 import com.ipeasa.models.ProductTable.bool
 import com.ipeasa.models.ProductTable.default
 import com.ipeasa.models.ProductTable.double
+import com.ipeasa.models.ProductTable.id
 import com.ipeasa.models.ProductTable.long
 import com.ipeasa.models.ProductTable.uuid
 import com.ipeasa.models.ProductTable.varchar
@@ -38,8 +41,14 @@ class ProductRepositoryImpl(
             price = rows.first()[ProductTable.price],
             currency = rows.first()[ProductTable.currency],
             materials = rows.map { ProductDetail(
-                it[ProductDetailTable.materialId].toString(),
-                it[ProductDetailTable.quantity]
+                quantity = it[ProductDetailTable.quantity],
+                material = Material(
+                    id = it[MaterialTable.materialId].toString(),
+                    name = it[MaterialTable.name],
+                    price = it[MaterialTable.price],
+                    currency = it[MaterialTable.currency],
+                    unit = it[MaterialTable.unit]
+                )
             ) }
         )
     }
@@ -72,7 +81,7 @@ class ProductRepositoryImpl(
 
         return transaction {
             try {
-                (ProductTable leftJoin ProductDetailTable)
+                (ProductTable leftJoin ProductDetailTable leftJoin MaterialTable)
                     .selectAll()
                     .where { ProductTable.productId eq uuid }
                     .orderBy(ProductTable.id to SortOrder.ASC)
