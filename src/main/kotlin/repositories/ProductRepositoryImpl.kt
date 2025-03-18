@@ -79,17 +79,18 @@ class ProductRepositoryImpl(
     override fun getProductByUuid(id: String): ProductAndDetail? {
         val uuid = uuidService.toValidUuid(id)
 
-        return transaction {
-            try {
+        try {
+            val product = transaction {
                 (ProductTable leftJoin ProductDetailTable leftJoin MaterialTable)
                     .selectAll()
                     .where { ProductTable.productId eq uuid }
                     .orderBy(ProductTable.id to SortOrder.ASC)
                     .groupBy { it[ProductTable.id] }
                     .let { productTableToProductAndDetail(it.values.flatten()) }
-            } catch (ex: Exception) {
-                null
             }
+            return product
+        } catch (ex: Exception) {
+            return null
         }
 
     }
