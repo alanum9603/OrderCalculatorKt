@@ -11,9 +11,9 @@ interface ProductRepository {
 
     fun getProductByUuid(id : String) : ProductAndDetail?
 
-    fun postProduct(productDtoC: ProductDtoC): ProductAndDetail?
+    fun postProduct(productAndDetail: ProductAndDetail) : ProductAndDetail?
 
-    fun putProduct(product: Product) : Product?
+    fun putProduct(productAndDetail: ProductAndDetail): ProductAndDetail?
 
-    fun deleteProduct(id: String) : Product?
+    fun deleteProduct(id: String) : ProductAndDetail?
 }

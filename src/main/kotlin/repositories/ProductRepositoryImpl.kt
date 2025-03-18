@@ -4,18 +4,9 @@ import com.ipeasa.ddds.Material
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
 import com.ipeasa.ddds.ProductDetail
-import com.ipeasa.dtos.product.ProductDtoC
 import com.ipeasa.models.MaterialTable
 import com.ipeasa.models.ProductDetailTable
 import com.ipeasa.models.ProductTable
-import com.ipeasa.models.ProductTable.autoIncrement
-import com.ipeasa.models.ProductTable.bool
-import com.ipeasa.models.ProductTable.default
-import com.ipeasa.models.ProductTable.double
-import com.ipeasa.models.ProductTable.id
-import com.ipeasa.models.ProductTable.long
-import com.ipeasa.models.ProductTable.uuid
-import com.ipeasa.models.ProductTable.varchar
 import com.ipeasa.utils.UuidService
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -92,20 +83,18 @@ class ProductRepositoryImpl(
         } catch (ex: Exception) {
             return null
         }
-
     }
 
-    override fun postProduct(productDtoC: ProductDtoC): ProductAndDetail? {
-
+    override fun postProduct(productAndDetail: ProductAndDetail) : ProductAndDetail? {
         val uuid = uuidService.generateUuidV6()
 
         transaction {
             ProductTable
                 .insert{
-                    it[ProductTable.productId] = uuid
-                    it[ProductTable.name] = productDtoC.name
-                    it[ProductTable.price] = productDtoC.price
-                    it[ProductTable.currency] = productDtoC.currency
+                    it[productId] = uuid
+                    it[name] = productAndDetail.name
+                    it[price] = productAndDetail.price
+                    it[currency] = productAndDetail.currency
                 }
 
             val productId : Long = ProductTable
@@ -114,15 +103,15 @@ class ProductRepositoryImpl(
                 .single()[ProductTable.id].toLong()
 
             ProductDetailTable
-                .batchInsert(productDtoC.materials) { productDetailDtoC ->
+                .batchInsert(productAndDetail.materials) { productDetail ->
                     val materialId: Long = MaterialTable
                         .select(MaterialTable.id)
-                        .where { MaterialTable.materialId eq uuidService.toValidUuid(productDetailDtoC.materialId) }
+                        .where { MaterialTable.materialId eq uuidService.toValidUuid(productDetail.material.id.toString()) }
                         .single()[MaterialTable.id].toLong()
 
                     this[ProductDetailTable.productId] = productId
                     this[ProductDetailTable.materialId] = materialId
-                    this[ProductDetailTable.quantity] = productDetailDtoC.quantity
+                    this[ProductDetailTable.quantity] = productDetail.quantity
                 }
         }
 
@@ -130,11 +119,20 @@ class ProductRepositoryImpl(
     }
 
 
-    override fun putProduct(product: Product): Product? {
+    override fun putProduct(productAndDetail: ProductAndDetail): ProductAndDetail? {
         TODO("Not yet implemented")
     }
 
-    override fun deleteProduct(id: String): Product? {
-        TODO("Not yet implemented")
+    override fun deleteProduct(id: String): ProductAndDetail? {
+        val product = getProductByUuid(id)
+
+        transaction {
+            ProductTable
+                .update(where = { ProductTable.productId eq uuidService.toValidUuid(id) }) {
+                    it[state] = false
+                }
+        }
+
+        return product
     }
 }

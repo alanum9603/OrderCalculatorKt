@@ -1,12 +1,14 @@
 package com.ipeasa.services
 
 import com.ipeasa.ddds.Material
+import com.ipeasa.dtos.material.DtoMapperMaterial
 import com.ipeasa.dtos.material.MaterialDtoC
 import com.ipeasa.dtos.material.MaterialDtoU
 import com.ipeasa.repositories.MaterialRepository
 
 class MaterialServiceImpl(
-    private val materialRepository: MaterialRepository
+    private val materialRepository: MaterialRepository,
+    private val dtoMapperMaterial: DtoMapperMaterial
 ) : MaterialService {
     override fun readAllMaterials(pageSize : Int, page : Long): List<Material> {
         return materialRepository.getAllMaterials(pageSize, page)
@@ -22,24 +24,13 @@ class MaterialServiceImpl(
 
     override fun createMaterial(materialDtoC: MaterialDtoC): Material? {
         return materialRepository.postMaterial(
-            Material(
-                name        = materialDtoC.name,
-                unit        = materialDtoC.unit,
-                price       = materialDtoC.price,
-                currency    = materialDtoC.currency
-            )
+            dtoMapperMaterial.materialDtoCToMaterial(materialDtoC)
         )
     }
 
     override fun updateMaterial(materialDtoU: MaterialDtoU): Material? {
         return materialRepository.putMaterial(
-            Material(
-                id          = materialDtoU.id,
-                name        = materialDtoU.name,
-                unit        = materialDtoU.unit,
-                price       = materialDtoU.price,
-                currency    = materialDtoU.currency
-            )
+            dtoMapperMaterial.materialDtoUToMaterial(materialDtoU)
         )
     }
 

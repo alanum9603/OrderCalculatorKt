@@ -66,5 +66,20 @@ fun Route.productRoutes(productService: ProductService) {
                 call.respond(HttpStatusCode.OK, productAndDetail)
             }
         }
+
+        delete {
+            val id = call.request.queryParameters["id"]?.trim()
+
+            if (!id.isNullOrEmpty()) {
+                val product = productService.deleteProduct(id)
+                if (product !== null) {
+                    call.respond(HttpStatusCode.OK, product)
+                } else {
+                    throw ObjectNotFoundException("product con id $id")
+                }
+            } else {
+                throw InvalidUuidException(message = "El id esta vacío")
+            }
+        }
     }
 }

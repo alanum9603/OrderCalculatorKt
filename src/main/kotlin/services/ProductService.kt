@@ -15,7 +15,7 @@ interface ProductService {
 
     fun createProduct(productDtoC: ProductDtoC) : ProductAndDetail?
 
-    fun updateProduct(productDtoU: ProductDtoU) : Product?
+    fun updateProduct(productDtoU: ProductDtoU) : ProductAndDetail?
 
-    fun deleteProduct(id : String) : Product?
+    fun deleteProduct(id : String) : ProductAndDetail?
 }
