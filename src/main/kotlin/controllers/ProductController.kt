@@ -3,10 +3,12 @@ package com.ipeasa.controllers
 import com.ipeasa.ddds.Material
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
+import com.ipeasa.dtos.product.ProductDtoC
 import com.ipeasa.exceptions.InvalidUuidException
 import com.ipeasa.exceptions.ObjectNotFoundException
 import com.ipeasa.services.ProductService
 import io.ktor.http.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
@@ -51,6 +53,17 @@ fun Route.productRoutes(productService: ProductService) {
                 }
             } else {
                 throw InvalidUuidException(message = "El id esta vacío")
+            }
+        }
+
+        post {
+            val productAndDetail = productService.createProduct(call.receive<ProductDtoC>())
+
+            println("hola")
+            print(productAndDetail.toString())
+
+            if (productAndDetail !== null) {
+                call.respond(HttpStatusCode.OK, productAndDetail)
             }
         }
     }

@@ -4,6 +4,7 @@ import com.ipeasa.ddds.Material
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
 import com.ipeasa.ddds.ProductDetail
+import com.ipeasa.dtos.product.ProductDtoC
 import com.ipeasa.models.MaterialTable
 import com.ipeasa.models.ProductDetailTable
 import com.ipeasa.models.ProductTable
@@ -16,16 +17,13 @@ import com.ipeasa.models.ProductTable.long
 import com.ipeasa.models.ProductTable.uuid
 import com.ipeasa.models.ProductTable.varchar
 import com.ipeasa.utils.UuidService
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.andWhere
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class ProductRepositoryImpl(
     private val uuidService: UuidService
 ) : ProductRepository {
-    private fun rowToProduct(row: ResultRow) : Product {
+    private fun rowToProduct(row: ResultRow): Product {
         return Product(
             id = row[ProductTable.productId].toString(),
             name = row[ProductTable.name],
@@ -34,22 +32,24 @@ class ProductRepositoryImpl(
         )
     }
 
-    private fun productTableToProductAndDetail(rows: List<ResultRow>) : ProductAndDetail {
+    private fun productTableToProductAndDetail(rows: List<ResultRow>): ProductAndDetail {
         return ProductAndDetail(
             id = rows.first()[ProductTable.productId].toString(),
             name = rows.first()[ProductTable.name],
             price = rows.first()[ProductTable.price],
             currency = rows.first()[ProductTable.currency],
-            materials = rows.map { ProductDetail(
-                quantity = it[ProductDetailTable.quantity],
-                material = Material(
-                    id = it[MaterialTable.materialId].toString(),
-                    name = it[MaterialTable.name],
-                    price = it[MaterialTable.price],
-                    currency = it[MaterialTable.currency],
-                    unit = it[MaterialTable.unit]
+            materials = rows.map {
+                ProductDetail(
+                    quantity = it[ProductDetailTable.quantity],
+                    material = Material(
+                        id = it[MaterialTable.materialId].toString(),
+                        name = it[MaterialTable.name],
+                        price = it[MaterialTable.price],
+                        currency = it[MaterialTable.currency],
+                        unit = it[MaterialTable.unit]
+                    )
                 )
-            ) }
+            }
         )
     }
 
@@ -94,11 +94,42 @@ class ProductRepositoryImpl(
 
     }
 
-    override fun postProduct(material: Product): Product? {
-        TODO("Not yet implemented")
+    override fun postProduct(productDtoC: ProductDtoC): ProductAndDetail? {
+
+        val uuid = uuidService.generateUuidV6()
+
+        transaction {
+            ProductTable
+                .insert{
+                    it[ProductTable.productId] = uuid
+                    it[ProductTable.name] = productDtoC.name
+                    it[ProductTable.price] = productDtoC.price
+                    it[ProductTable.currency] = productDtoC.currency
+                }
+
+            val productId : Long = ProductTable
+                .select(ProductTable.id)
+                .where { ProductTable.productId eq uuid }
+                .single()[ProductTable.id].toLong()
+
+            ProductDetailTable
+                .batchInsert(productDtoC.materials) { productDetailDtoC ->
+                    val materialId: Long = MaterialTable
+                        .select(MaterialTable.id)
+                        .where { MaterialTable.materialId eq uuidService.toValidUuid(productDetailDtoC.materialId) }
+                        .single()[MaterialTable.id].toLong()
+
+                    this[ProductDetailTable.productId] = productId
+                    this[ProductDetailTable.materialId] = materialId
+                    this[ProductDetailTable.quantity] = productDetailDtoC.quantity
+                }
+        }
+
+        return getProductByUuid(uuid.toString())
     }
 
-    override fun putProduct(material: Product): Product? {
+
+    override fun putProduct(product: Product): Product? {
         TODO("Not yet implemented")
     }
 

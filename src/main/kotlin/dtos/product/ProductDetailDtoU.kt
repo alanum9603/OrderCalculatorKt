@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProductDetailDtoU(
-    val id : String,
+    val id : Long? = null,
+    val materialId : String,
     val quantity : Int
 )

@@ -2,6 +2,8 @@ package com.ipeasa.services
 
 import com.ipeasa.ddds.Product
 import com.ipeasa.ddds.ProductAndDetail
+import com.ipeasa.dtos.product.ProductDtoC
+import com.ipeasa.dtos.product.ProductDtoU
 
 
 interface ProductService {
@@ -11,9 +13,9 @@ interface ProductService {
 
     fun readProductById(id : String) : ProductAndDetail?
 
-    // fun createProduct(materialDtoC: ProductDtoC) : Product?
+    fun createProduct(productDtoC: ProductDtoC) : ProductAndDetail?
 
-    // fun updateProduct(materialDtoU: ProductDtoU) : Product?
+    fun updateProduct(productDtoU: ProductDtoU) : Product?
 
     fun deleteProduct(id : String) : Product?
 }
