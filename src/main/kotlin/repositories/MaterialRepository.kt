@@ -3,6 +3,8 @@ package com.ipeasa.repositories
 import com.ipeasa.ddds.Material
 
 interface MaterialRepository {
+    fun isExistsMaterialName(material: Material) : Boolean
+
     fun getAllMaterials(pageSize : Int, page : Long) : List<Material>
 
     fun getMaterialsByName(name : String, pageSize : Int, page : Long) : List<Material>

@@ -1,6 +1,7 @@
 package com.ipeasa.repositories
 
 import com.ipeasa.ddds.Material
+import com.ipeasa.exceptions.AlreadyExistsException
 import com.ipeasa.models.MaterialTable
 import com.ipeasa.utils.UuidService
 import org.jetbrains.exposed.sql.*
@@ -19,6 +20,15 @@ class MaterialRepositoryImpl(
             currency = row[MaterialTable.currency],
             unit = row[MaterialTable.unit]
         )
+    }
+
+    override fun isExistsMaterialName(material: Material): Boolean {
+        return transaction {
+            MaterialTable
+                .selectAll()
+                .where { MaterialTable.name eq material.name }
+                .count() > 0
+        }
     }
 
     override fun getAllMaterials(pageSize : Int, page : Long) : List<Material> {
@@ -59,22 +69,25 @@ class MaterialRepositoryImpl(
     }
 
     override fun postMaterial(material: Material): Material? {
+        if (isExistsMaterialName(material)) {
+            val uuid = uuidService.generateUuidV6()
 
-        val uuid = uuidService.generateUuidV6()
+            transaction {
+                MaterialTable
+                    .insert {
+                        it[materialId] = uuid
+                        it[name] = material.name
+                        it[price] = material.price
+                        it[unit] = material.unit
+                        it[currency] = material.currency
+                        it[state] = true
+                    }
+            }
 
-        transaction {
-            MaterialTable
-                .insert {
-                    it[materialId] = uuid
-                    it[name] = material.name
-                    it[price] = material.price
-                    it[unit] = material.unit
-                    it[currency] = material.currency
-                    it[state] = true
-                }
+            return getMaterialByUuid(uuid.toString())
+        } else {
+            throw AlreadyExistsException("material con nombre ${material.name}")
         }
-
-        return getMaterialByUuid(uuid.toString())
     }
 
     override fun putMaterial(material: Material): Material? {
