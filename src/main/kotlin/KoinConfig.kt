@@ -2,16 +2,12 @@ package com.ipeasa
 
 import com.ipeasa.dtos.material.DtoMapperMaterial
 import com.ipeasa.dtos.material.DtoMapperMaterialImpl
+import com.ipeasa.dtos.order.DtoMapperOrder
+import com.ipeasa.dtos.order.DtoMapperOrderImpl
 import com.ipeasa.dtos.product.DtoMapperProduct
 import com.ipeasa.dtos.product.DtoMapperProductImpl
-import com.ipeasa.repositories.MaterialRepository
-import com.ipeasa.repositories.MaterialRepositoryImpl
-import com.ipeasa.repositories.ProductRepository
-import com.ipeasa.repositories.ProductRepositoryImpl
-import com.ipeasa.services.MaterialService
-import com.ipeasa.services.MaterialServiceImpl
-import com.ipeasa.services.ProductService
-import com.ipeasa.services.ProductServiceImpl
+import com.ipeasa.repositories.*
+import com.ipeasa.services.*
 import com.ipeasa.utils.UuidService
 import io.ktor.server.application.*
 import org.koin.ktor.plugin.Koin
@@ -30,10 +26,13 @@ val appModule = module {
 
     single<MaterialRepository> { MaterialRepositoryImpl(get()) }
     single<ProductRepository> { ProductRepositoryImpl(get()) }
+    single<OrderRepository> { OrderRepositoryImpl() }
 
     single<DtoMapperMaterial> { DtoMapperMaterialImpl() }
-    single<DtoMapperProduct> { DtoMapperProductImpl(get(), get()) }
+    single<DtoMapperProduct> { DtoMapperProductImpl(get()) }
+    single<DtoMapperOrder> { DtoMapperOrderImpl() }
 
     single<MaterialService> { MaterialServiceImpl(get(), get()) }
     single<ProductService> { ProductServiceImpl(get(), get()) }
+    single<OrderService> { OrderServiceImpl(get()) }
 }

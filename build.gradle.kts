@@ -25,6 +25,7 @@ dependencies {
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.status.pages)
     implementation(libs.exposed.core)
+    implementation(libs.exposed.java.time)
     implementation(libs.exposed.jdbc)
     implementation(libs.h2)
     implementation(libs.koin.ktor)

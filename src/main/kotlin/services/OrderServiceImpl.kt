@@ -1,4 +1,12 @@
 package com.ipeasa.services
 
-class OrderServiceImpl() : OrderService {
+import com.ipeasa.ddds.OrderAndDetail
+import com.ipeasa.repositories.OrderRepository
+
+class OrderServiceImpl(
+    orderRepository: OrderRepository
+) : OrderService {
+    override fun readOrdersByRuc(pageSize: Int, page: Long): List<OrderAndDetail> {
+        TODO("Not yet implemented")
+    }
 }

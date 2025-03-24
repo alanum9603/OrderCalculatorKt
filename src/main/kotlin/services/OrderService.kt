@@ -1,5 +1,7 @@
 package com.ipeasa.services
 
+import com.ipeasa.ddds.OrderAndDetail
+
 interface OrderService {
-    fun readAllOrders(pageSize : Int, page : Long) : List
+    fun readOrdersByRuc(pageSize : Int, page : Long) : List<OrderAndDetail>
 }

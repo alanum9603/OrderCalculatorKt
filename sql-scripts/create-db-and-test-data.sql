@@ -73,8 +73,8 @@ CREATE TABLE `orders`
     `ruc` varchar(20),
     `date` date,
 	`total` double,
-    `currency_pen_to_usd` varchar(3),
-    `exchange` double,
+    `currency` varchar(3),
+    `exchange_pen_to_usd` double,
     `address` varchar(255),
     `state` boolean,
     CONSTRAINT `order_pk_id` PRIMARY KEY (`id`)

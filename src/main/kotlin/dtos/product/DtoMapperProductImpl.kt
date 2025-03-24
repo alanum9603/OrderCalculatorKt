@@ -4,11 +4,9 @@ import com.ipeasa.ddds.ProductAndDetail
 import com.ipeasa.ddds.ProductDetail
 import com.ipeasa.exceptions.ObjectNotFoundException
 import com.ipeasa.repositories.MaterialRepository
-import com.ipeasa.utils.UuidService
 
 class DtoMapperProductImpl(
-    private val materialRepository: MaterialRepository,
-    private val uuidService: UuidService
+    private val materialRepository: MaterialRepository
 ) : DtoMapperProduct {
     override fun productDetailDtoCToProductDetail(productDetailDtoC: ProductDetailDtoC) : ProductDetail {
         return ProductDetail(
