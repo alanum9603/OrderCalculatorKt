@@ -12,7 +12,7 @@ class MaterialRepositoryImpl(
     private val uuidService: UuidService
 ) : MaterialRepository {
 
-    private fun rowToMaterial(row : ResultRow) : Material {
+    override fun rowToMaterial(row : ResultRow) : Material {
         return Material(
             id = row[MaterialTable.materialId].toString(),
             name = row[MaterialTable.name],
@@ -28,6 +28,17 @@ class MaterialRepositoryImpl(
                 .selectAll()
                 .where { MaterialTable.name eq material.name }
                 .count() > 0
+        }
+    }
+
+    override fun getMaterialIdByUuid(uuidString: String?) : Long {
+        val uuid = uuidService.toValidUuid(uuidString!!)
+
+        return transaction {
+            MaterialTable
+                .select(MaterialTable.id)
+                .where { MaterialTable.materialId eq uuid }
+                .single()[MaterialTable.id].toLong()
         }
     }
 

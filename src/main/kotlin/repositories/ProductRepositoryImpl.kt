@@ -13,9 +13,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
 class ProductRepositoryImpl(
-    private val uuidService: UuidService
+    private val uuidService: UuidService,
+    private val materialRepository: MaterialRepository
 ) : ProductRepository {
-    private fun rowToProduct(row: ResultRow): Product {
+    override fun rowToProduct(row: ResultRow): Product {
         return Product(
             id          = row[ProductTable.productId].toString(),
             name        = row[ProductTable.name],
@@ -24,44 +25,36 @@ class ProductRepositoryImpl(
         )
     }
 
-    private fun productTableToProductAndDetail(rows: List<ResultRow>): ProductAndDetail {
+    override fun rowToProductDetail(row: ResultRow) : ProductDetail {
+        return ProductDetail(
+            quantity = row[ProductDetailTable.quantity],
+            material = Material(
+                id          = row[MaterialTable.materialId].toString(),
+                name        = row[MaterialTable.name],
+                price       = row[MaterialTable.price],
+                currency    = row[MaterialTable.currency],
+                unit        = row[MaterialTable.unit]
+            )
+        )
+    }
+
+    override fun rowsToProductAndDetail(rows: List<ResultRow>): ProductAndDetail {
         return ProductAndDetail(
             id          = rows.first()[ProductTable.productId].toString(),
             name        = rows.first()[ProductTable.name],
             price       = rows.first()[ProductTable.price],
             currency    = rows.first()[ProductTable.currency],
-            materials   = rows.map {
-                ProductDetail(
-                    quantity = it[ProductDetailTable.quantity],
-                    material = Material(
-                        id          = it[MaterialTable.materialId].toString(),
-                        name        = it[MaterialTable.name],
-                        price       = it[MaterialTable.price],
-                        currency    = it[MaterialTable.currency],
-                        unit        = it[MaterialTable.unit]
-                    )
-                )
-            }
+            materials   = rows.map { rowToProductDetail(it) }
         )
     }
 
-    private fun getProductIdByUuid(uuid: UUID) : Long {
+    override fun getProductIdByUuid(uuidString: String?) : Long {
+        val uuid = uuidService.toValidUuid(uuidString)
         return transaction {
             ProductTable
                 .select(ProductTable.id)
                 .where { ProductTable.productId eq uuid }
                 .single()[ProductTable.id].toLong()
-        }
-    }
-
-    private fun getMaterialIdByUuid(uuidString: String?) : Long {
-        val uuid = uuidService.toValidUuid(uuidString!!)
-
-        return transaction {
-            MaterialTable
-                .select(MaterialTable.id)
-                .where { MaterialTable.materialId eq uuid }
-                .single()[MaterialTable.id].toLong()
         }
     }
 
@@ -98,7 +91,7 @@ class ProductRepositoryImpl(
                     .where { ProductTable.productId eq uuid }
                     .orderBy(ProductTable.id to SortOrder.ASC)
                     .groupBy { it[ProductTable.id] }
-                    .let { productTableToProductAndDetail(it.values.flatten()) }
+                    .let { rowsToProductAndDetail(it.values.flatten()) }
             }
             return product
         } catch (ex: Exception) {
@@ -123,9 +116,7 @@ class ProductRepositoryImpl(
 
             ProductDetailTable
                 .batchInsert(productAndDetail.materials) { productDetail ->
-                        val materialId: Long = getMaterialIdByUuid(
-                            productDetail.material.id
-                        )
+                        val materialId: Long = materialRepository.getMaterialIdByUuid(productDetail.material.id)
 
                         this[ProductDetailTable.productId]  = theProductId
                         this[ProductDetailTable.materialId] = materialId
@@ -152,9 +143,7 @@ class ProductRepositoryImpl(
 
             ProductDetailTable
                 .batchUpsert(productAndDetail.materials) { productDetail ->
-                        val materialId: Long = getMaterialIdByUuid(
-                            productDetail.material.id
-                        )
+                        val materialId: Long = materialRepository.getMaterialIdByUuid(productDetail.material.id)
 
                         this[ProductDetailTable.productId] = theProductId
                         this[ProductDetailTable.materialId] = materialId

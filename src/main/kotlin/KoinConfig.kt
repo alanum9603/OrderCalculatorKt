@@ -26,7 +26,7 @@ val appModule = module {
 
     single<MaterialRepository> { MaterialRepositoryImpl(get()) }
     single<ProductRepository> { ProductRepositoryImpl(get()) }
-    single<OrderRepository> { OrderRepositoryImpl() }
+    single<OrderRepository> { OrderRepositoryImpl(get()) }
 
     single<DtoMapperMaterial> { DtoMapperMaterialImpl() }
     single<DtoMapperProduct> { DtoMapperProductImpl(get()) }

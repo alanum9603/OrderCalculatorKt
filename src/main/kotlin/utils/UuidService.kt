@@ -10,7 +10,7 @@ class UuidService {
         return UuidCreator.getTimeOrdered()
     }
 
-    fun toValidUuid(uuidString : String) : UUID {
+    fun toValidUuid(uuidString : String?) : UUID {
         try {
             return UUID.fromString(uuidString)
         } catch (ex : IllegalArgumentException) {

@@ -6,5 +6,5 @@ import com.ipeasa.ddds.OrderAndDetail
 interface OrderRepository {
     fun getOrdersByRuc(ruc : String, pageSize : Int, page : Long) : List<Order>
 
-    fun getOrderByUuid(id : String) : OrderAndDetail
+    fun getOrderByUuid(id : String) : OrderAndDetail?
 }

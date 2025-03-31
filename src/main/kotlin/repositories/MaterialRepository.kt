@@ -1,9 +1,14 @@
 package com.ipeasa.repositories
 
 import com.ipeasa.ddds.Material
+import org.jetbrains.exposed.sql.ResultRow
 
 interface MaterialRepository {
+    fun rowToMaterial(row : ResultRow) : Material
+
     fun isExistsMaterialName(material: Material) : Boolean
+
+    fun getMaterialIdByUuid(uuidString: String?) : Long
 
     fun getAllMaterials(pageSize : Int, page : Long) : List<Material>
 
