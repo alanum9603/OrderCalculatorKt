@@ -112,7 +112,7 @@ class ProductRepositoryImpl(
                     it[state] = true
                 }
 
-            val theProductId : Long = getProductIdByUuid(uuid)
+            val theProductId : Long = getProductIdByUuid(uuid.toString())
 
             ProductDetailTable
                 .batchInsert(productAndDetail.materials) { productDetail ->
@@ -139,7 +139,7 @@ class ProductRepositoryImpl(
                     it[currency] = productAndDetail.currency
                 }
 
-            val theProductId : Long = getProductIdByUuid(uuid)
+            val theProductId : Long = getProductIdByUuid(uuid.toString())
 
             ProductDetailTable
                 .batchUpsert(productAndDetail.materials) { productDetail ->

@@ -25,8 +25,8 @@ val appModule = module {
     single { UuidService() }
 
     single<MaterialRepository> { MaterialRepositoryImpl(get()) }
-    single<ProductRepository> { ProductRepositoryImpl(get()) }
-    single<OrderRepository> { OrderRepositoryImpl(get()) }
+    single<ProductRepository> { ProductRepositoryImpl(get(), get()) }
+    single<OrderRepository> { OrderRepositoryImpl(get(), get()) }
 
     single<DtoMapperMaterial> { DtoMapperMaterialImpl() }
     single<DtoMapperProduct> { DtoMapperProductImpl(get()) }

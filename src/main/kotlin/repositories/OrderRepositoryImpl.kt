@@ -1,8 +1,7 @@
 package com.ipeasa.repositories
 
-import com.ipeasa.ddds.Order
-import com.ipeasa.ddds.OrderAndDetail
-import com.ipeasa.ddds.OrderProduct
+import com.ipeasa.ddds.*
+import com.ipeasa.exceptions.ObjectNotFoundException
 import com.ipeasa.models.OrderProductMaterialTable
 import com.ipeasa.models.OrderProductTable
 import com.ipeasa.models.OrderTable
@@ -15,7 +14,8 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class OrderRepositoryImpl(
-    private val uuidService: UuidService
+    private val uuidService: UuidService,
+    private val productRepository: ProductRepository
 ) : OrderRepository {
     private fun rowToOrder(row: ResultRow) : Order {
         return Order(
@@ -29,26 +29,41 @@ class OrderRepositoryImpl(
         )
     }
 
-    private fun rowsToOrderAndDetail(rows: List<ResultRow>) : OrderAndDetail {
-        var product = rows.first()[ProductTable.productId]
-        val productList = mutableListOf<>()
+    private fun rowToOrderProduct(productUuid: String, quantity: Double) : OrderProduct? {
+        val product = productRepository.getProductByUuid(productUuid)
+        return product?.let {
+            return OrderProduct(
+                product,
+                quantity
+            )
+        }
+    }
 
-        return OrderAndDetail(
-            rows.first()[OrderTable.orderId].toString(),
-            rows.first()[OrderTable.ruc],
-            rows.first()[OrderTable.date].toString(),
-            rows.first()[OrderTable.total],
-            rows.first()[OrderTable.currency],
-            rows.first()[OrderTable.exchange],
-            rows.first()[OrderTable.address],
-            rows.forEach { (row) ->
-                if (product == it[ProductTable.productId]) {
-                    productList.add
-                } else {
-                    product = ""
-                }
+    private fun rowsToOrderAndDetail(rows: List<ResultRow>) : OrderAndDetail? {
+        val products = mutableListOf<OrderProduct>()
+
+        rows.forEach {
+            val product: OrderProduct? = rowToOrderProduct(it[ProductTable.productId].toString(), it[OrderProductTable.quantity])
+            product?.let {
+                products.add(product)
             }
-        )
+        }
+
+        return if (rows.isNotEmpty()) {
+            OrderAndDetail(
+                rows.first()[OrderTable.orderId].toString(),
+                rows.first()[OrderTable.ruc],
+                rows.first()[OrderTable.date].toString(),
+                rows.first()[OrderTable.total],
+                rows.first()[OrderTable.currency],
+                rows.first()[OrderTable.exchange],
+                rows.first()[OrderTable.address],
+                products
+            )
+        } else {
+            null
+        }
+
     }
 
     override fun getOrdersByRuc(ruc: String, pageSize: Int, page: Long) : List<Order> {
@@ -67,8 +82,8 @@ class OrderRepositoryImpl(
     override fun getOrderByUuid(id: String): OrderAndDetail? {
         val uuid = uuidService.toValidUuid(id)
 
-        return transaction {
-            (OrderTable leftJoin OrderProductTable leftJoin OrderProductMaterialTable)
+        val order =  transaction {
+            (OrderTable leftJoin OrderProductTable)
                 .selectAll()
                 .where { OrderTable.orderId eq uuid }
                 .andWhere { OrderTable.state eq true }
@@ -76,5 +91,7 @@ class OrderRepositoryImpl(
                 .toList()
                 .let { rowsToOrderAndDetail(it) }
         }
+
+        return order?: throw ObjectNotFoundException("orden $id")
     }
 }

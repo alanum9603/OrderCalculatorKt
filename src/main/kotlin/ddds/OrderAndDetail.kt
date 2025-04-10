@@ -11,5 +11,5 @@ data class OrderAndDetail (
     val currency : String,
     val exchange : Double,
     val address : String,
-    val products : List<Product>
+    val products : List<OrderProduct>
 )
